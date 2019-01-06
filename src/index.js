@@ -4,9 +4,10 @@ import './index.css'
 
 function Timer(props) {
     return (
-        <h1>
+        <span>
             {props.time}
-        </h1>
+        </span>
+        
     );
 }
 
@@ -312,12 +313,20 @@ class Game extends React.Component {
                     rows={this.state.rows}
                     onClick={(index) => this.handleClick(index)} 
                 />
-                <div>
-                    <Timer time={this.state.time} />
-                </div>
-                <div className='reset-btn'>
-                    <Reset onClick={() => this.reset()} />
-                </div>
+                <ul>
+                    <li>
+                        <div className='timer'>
+                            <Timer time={this.state.time} />
+                        </div>
+                    </li>
+                    <li>
+                        <div className='reset-btn'>
+                            <Reset onClick={() => this.reset()} />
+                        </div>
+                    </li>
+                    
+                </ul>
+                
             </div>
         );
     }
