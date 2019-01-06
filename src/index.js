@@ -273,7 +273,7 @@ class Game extends React.Component {
 
     setValue(currentBoard, i, j) {
         if (this.checkMine(currentBoard, i, j)) {
-            currentBoard[i][j].value = 0;
+            currentBoard[i][j].value = 'X';
             return;
         }
         var value = 0;
