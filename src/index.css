@@ -6,17 +6,54 @@ body {
 .square {
     background: #fff;
     border: 1px solid #999;
-    /* float: left; */
+    float: left;
     font-size: 24px;
     font-weight: bold;
     line-height: 34px;
     height: 54px;
     margin-right: -1px;
-    margin-top: -1px;
+    margin-top: -4px;
     padding: 0;
     text-align: center;
     width: 54px;
+    display: inline-block;
   }
+
+  .square-show {
+      background: #999
+  }
+
+ .game {
+     display: flex;
+     flex-direction: row;
+ } 
+
+.row {
+    display: block;
+    font-size: 0px;
+}
+
+.row::after {
+    clear: both;
+    content: "";
+    display: table;
+}
+
+.zero {
+    color: white;
+}
+
+.one {
+    color: #111111;
+}
+
+.two {
+    color: antiquewhite;
+}
+
+.three {
+    color: blue;
+}
 
 .mine {
     background: red;

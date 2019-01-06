@@ -2,18 +2,35 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
 
-// function Square(props) {
-//     return (
-//         <button className='square' >
-//             {props.value}
-//         </button>
-//     );
-// }
-
-class Square extends React.Component {
+class Square extends React.Component {    
     render() {
+        var className = "square";
+        if (this.props.info.showOrNot) {
+            className += " square-show";
+            if (this.props.info.mineOrNot) {
+                className += " mine";
+            } else {
+                switch (this.props.info.value) {
+                    case 0:
+                        className += " zero";
+                        break;
+                    case 1:
+                        className += " one";
+                        break;
+                    case 2:
+                        className += " two";
+                        break;
+                    case 3:
+                        className += " three";
+                        break;
+                    default:
+                        
+                }
+
+            }
+        }
         return (
-            <button className={'square' + (this.props.info.mineOrNot ? ' mine' : '') } onClick={() => this.props.onClick(this.props.info.index)}>
+            <button className={className} onClick={() => this.props.onClick(this.props.info.index)}>
                 {
                     (this.props.info.showOrNot ? 
                         this.props.info.value :
@@ -35,7 +52,7 @@ function OneRow(props) {
 class Board extends React.Component {
     renderRows() {
         return (
-            <div>
+            <div className='board'>
                 {this.props.rows.map((row) => <OneRow row={row} onClick={this.props.onClick} />)}
             </div>
         );
@@ -69,7 +86,7 @@ class Game extends React.Component {
 
     handleClick(index) {
         if (this.state.isBegin) {
-            this.generateMines(20);
+            this.generateMines(index, 20);
         }
         this.display(index);
     }
@@ -128,19 +145,30 @@ class Game extends React.Component {
         return currentBoard;
     }
 
-    generateMines(numberOfMines) {
+    generateMines(ori_index, numberOfMines) {
         var currentBoard = this.state.rows.slice();
         const shape = this.state.shape;
         const totalSquares = shape * shape;
+        const ori_ret= this.indexToCordinates(ori_index);
+        const ori_i = ori_ret[0];
+        const ori_j = ori_ret[1];
+        const around = this.avaliableAround(ori_i, ori_j);
+        // console.log(ori_i, ori_j, around, currentBoard);
         while (numberOfMines) {
             const index = randInt(0, totalSquares);
-            const ret= this.indexToCordinates(index);
-            if (!ret) {
-                continue;
-            }
+            const ret = this.indexToCordinates(index);
             const i = ret[0];
             const j = ret[1];
+            // The mine will not around the first click.
+            if (this.cordinatesInArray(around, i, j)) {
+                continue;
+            }
+            // No repeated mine loc.
             if (this.checkMine(currentBoard, i, j)) {
+                continue;
+            }
+            // The mine is not the click loc.
+            if (i === ori_i && j === ori_j){
                 continue;
             }
             currentBoard[i][j].mineOrNot = true;
@@ -164,6 +192,15 @@ class Game extends React.Component {
         return currentBoard[i][j].mineOrNot === true;
     }
 
+    cordinatesInArray(array, i, j) {    
+        for (let x in array) {
+            if (array[x][0] === i && array[x][1] === j) {
+                return true
+            }
+        }
+        return false;
+    }
+
     indexToCordinates(index) {
         if (index >= this.state.shape*this.state.shape || index < 0) {
             return null;
@@ -176,7 +213,7 @@ class Game extends React.Component {
             index: index,
             mineOrNot: false,
             showOrNot: false,
-            value: '   ',
+            value: 0,
         });
     }
 
@@ -208,10 +245,12 @@ class Game extends React.Component {
 
     render() {
         return (
-            <Board 
-                rows={this.state.rows}
-                onClick={(index) => this.handleClick(index)} 
-            />
+            <div className='game'>
+                <Board 
+                    rows={this.state.rows}
+                    onClick={(index) => this.handleClick(index)} 
+                />
+            </div>
         );
     }
 }
