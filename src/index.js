@@ -98,6 +98,7 @@ class Game extends React.Component {
         const j = ret[1];
         if (this.checkMine(currentBoard, i, j)) {
             alert('Boom!');
+            this.displayAll();
             return;
         }
         currentBoard[i][j].showOrNot = true;
@@ -143,6 +144,18 @@ class Game extends React.Component {
             currentBoard = this.displayRecursion(currentBoard, x_i, x_j);
         }
         return currentBoard;
+    }
+
+    displayAll() {
+        var currentBoard = this.state.rows.slice();
+        for (let i = 0; i < this.state.shape; i++) {
+            for (let j = 0; j < this.state.shape; j++) {
+                currentBoard[i][j].showOrNot = true;
+            }
+        }
+        this.setState({
+            rows: currentBoard,
+        });
     }
 
     generateMines(ori_index, numberOfMines) {
