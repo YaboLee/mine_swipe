@@ -2,6 +2,22 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
 
+function Timer(props) {
+    return (
+        <h1>
+            {props.time}
+        </h1>
+    );
+}
+
+function Reset(props) {
+    return (
+        <button onClick={props.onClick}>
+            Reset
+        </button>
+    );
+}
+
 class Square extends React.Component {    
     render() {
         var className = "square";
@@ -68,20 +84,44 @@ class Board extends React.Component {
 class Game extends React.Component {
     constructor(props) {
         super(props);
-        var rows = Array(props.shape);
-        var count = 0;
-        for (let i = 0; i < props.shape; i++) {
-            rows[i] = Array(props.shape);
-            for (let j = 0; j < props.shape; j++) {
-                rows[i][j] = this.initializeSquare(count);
-                count += 1;
-            }
-        }
+        const rows = this.initializeBoard(props.shape);
         this.state = {
             shape: props.shape,
             rows: rows,
             isBegin: true,
+            time: 0,
         }
+    }
+
+    initializeBoard(shape) {
+        var rows = Array(shape);
+        var count = 0;
+        for (let i = 0; i < shape; i++) {
+            rows[i] = Array(shape);
+            for (let j = 0; j < shape; j++) {
+                rows[i][j] = this.initializeSquare(count);
+                count += 1;
+            }
+        }
+        return rows;
+    }
+
+    componentDidMount() {
+        this.timerID = setInterval(
+            () => this.tick(),
+            1000
+        );
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.timerID);
+    }
+
+    tick() {
+        const newTime = this.state.time + 1;
+        this.setState({
+            time: newTime,
+        });
     }
 
     handleClick(index) {
@@ -256,6 +296,15 @@ class Game extends React.Component {
         return ret;
     }
 
+    reset() {
+        const rows = this.initializeBoard(this.state.shape);
+        this.setState({
+            rows: rows,
+            isBegin: true,
+            time: 0,
+        });
+    }
+
     render() {
         return (
             <div className='game'>
@@ -263,6 +312,12 @@ class Game extends React.Component {
                     rows={this.state.rows}
                     onClick={(index) => this.handleClick(index)} 
                 />
+                <div>
+                    <Timer time={this.state.time} />
+                </div>
+                <div className='reset-btn'>
+                    <Reset onClick={() => this.reset()} />
+                </div>
             </div>
         );
     }
