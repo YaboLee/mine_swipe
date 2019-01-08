@@ -19,6 +19,20 @@ function Reset(props) {
     );
 }
 
+function Game_info(props) {
+        return (
+            <div>
+                {
+                    props.success ?
+
+                    "You win!!!"
+                    :
+                    "Boom shakalaka!"
+                }
+            </div>
+        );
+}
+
 class Square extends React.Component {    
     render() {
         var className = "square";
@@ -91,6 +105,8 @@ class Game extends React.Component {
             rows: rows,
             isBegin: true,
             time: 0,
+            end: false,
+            success: false,
         }
     }
 
@@ -129,7 +145,29 @@ class Game extends React.Component {
         if (this.state.isBegin) {
             this.generateMines(index, 20);
         }
+        if (this.state.end) {
+            return;
+        }
+        var currentBoard = this.state.rows.slice();
+        const ret = this.indexToCordinates(index);
+        const i = ret[0];
+        const j = ret[1];
+        if (this.checkMine(currentBoard, i, j)) {
+            this.displayAll();
+            this.setState({
+                end: true,
+                success: false,
+            });
+            return;
+        }
         this.display(index);
+        if (this.checkSuccess()) {
+            this.displayAll();
+            this.setState({
+                end: true,
+                success: true,
+            });
+        }
     }
 
     display(index) {
@@ -137,11 +175,6 @@ class Game extends React.Component {
         const ret = this.indexToCordinates(index);
         const i = ret[0];
         const j = ret[1];
-        if (this.checkMine(currentBoard, i, j)) {
-            alert('Boom!');
-            this.displayAll();
-            return;
-        }
         currentBoard[i][j].showOrNot = true;
         if (currentBoard[i][j].value > 0) {
             this.setState({
@@ -297,12 +330,26 @@ class Game extends React.Component {
         return ret;
     }
 
+    checkSuccess() {
+        const currentBoard = this.state.rows.slice();
+        for (let i = 0; i < this.state.shape; i++) {
+            for (let j = 0; j < this.state.shape; j++) {
+                if (!this.checkMine(currentBoard, i, j) && !currentBoard[i][j].showOrNot) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     reset() {
         const rows = this.initializeBoard(this.state.shape);
         this.setState({
             rows: rows,
             isBegin: true,
             time: 0,
+            end: false,
+            success: false,
         });
     }
 
@@ -324,9 +371,14 @@ class Game extends React.Component {
                             <Reset onClick={() => this.reset()} />
                         </div>
                     </li>
-                    
+                    {
+                        this.state.end ?
+
+                        <Game_info success={this.state.success} />
+                        :
+                        ""
+                    }
                 </ul>
-                
             </div>
         );
     }
@@ -339,6 +391,6 @@ function randInt(floor, roof) {
 }
 
 ReactDOM.render(
-    <Game shape={12}/>,
+    <Game shape={10}/>,
     document.getElementById('root')
 );
